@@ -1,165 +1,173 @@
 using System;
-using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
-
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
 
 namespace CalcolatriceWinFormCam1
 {
   public partial class Form1 : Form
   {
+    double valore1 = 0;
+    string operatore = "";
+    bool nuovoNumero = false;
+
     public Form1 ( )
     {
       InitializeComponent ( );
-    }
+      txtDisplay.Text = "0";
 
-    private void displayTxt ( object sender, EventArgs e )
-    {
 
     }
 
     private void Form1_Load ( object sender, EventArgs e )
     {
       txtDisplay.Text = "0";
+      txtDisplay.ContextMenuStrip = contextMenuStrip1;
+      //contextMenuStrip1.Text_ = "Salva Parziale";
+      //toolStripMenuItem1.Click += menuSalvaParziale_Click;
 
     }
 
-    private void Btn0_Click ( object sender, EventArgs e )
+    // ------------------------------
+    //  NUMERI (0–9)
+    // ------------------------------
+    private void BtnNumero_Click ( object sender, EventArgs e )
     {
-      System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+      Button b = (Button)sender;
 
-      // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-      if(txtDisplay.Text == "0")
+      // Se devo iniziare un nuovo numero
+      if(txtDisplay.Text == "0" || nuovoNumero)
+      {
         txtDisplay.Text = b.Text;
+        nuovoNumero = false;
+      }
       else
+      {
         txtDisplay.Text += b.Text;
-    }
-
-
-    private void Btn1_click ( object sender, EventArgs e )
-    {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
-
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
       }
     }
 
-    private void Btn2_click ( object sender, EventArgs e )
+    // ------------------------------
+    //  OPERATORI (+ - * /)
+    // ------------------------------
+    private void BtnOperatore_Click ( object sender, EventArgs e )
     {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+      Button b = (Button)sender;
 
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
+      if(double.TryParse (txtDisplay.Text, out double v))
+      {
+        valore1 = v;
+        operatore = b.Text;
+        nuovoNumero = true;
       }
     }
 
-    private void Btn3_click ( object sender, EventArgs e )
+    // ------------------------------
+    //  UGUALE (=)
+    // ------------------------------
+    private void btnEquals_Click ( object sender, EventArgs e )
     {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+      if(!double.TryParse (txtDisplay.Text, out double valore2))
+        return;
 
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
+      double risultato = 0;
+
+      switch(operatore)
+      {
+        case "+":
+          risultato = valore1 + valore2;
+          break;
+        case "-":
+          risultato = valore1 - valore2;
+          break;
+        case "*":
+          risultato = valore1 * valore2;
+          break;
+        case "/":
+          if(valore2 == 0)
+          {
+            MessageBox.Show ("Divisione per zero non consentita");
+            return;
+          }
+          risultato = valore1 / valore2;
+          break;
+        default:
+          return;
+      }
+
+      txtDisplay.Text = risultato.ToString ( );
+      nuovoNumero = true;
+    }
+
+    // ------------------------------
+    //  CLEAR (C)
+    // ------------------------------
+    private void btnClear_Click ( object sender, EventArgs e )
+    {
+      txtDisplay.Text = "0";
+      valore1 = 0;
+      operatore = "";
+      nuovoNumero = false;
+    }
+
+    // ------------------------------
+    //  OPERATORI SPECIFICI (reindirizzati)
+    // ------------------------------
+    private void btnAdd_Click ( object sender, EventArgs e )
+    {
+      BtnOperatore_Click (sender, e);
+    }
+
+    private void btndiv_Click ( object sender, EventArgs e )
+    {
+      BtnOperatore_Click (sender, e);
+    }
+
+    // ------------------------------
+    //  MENU: Salva Parziale (ancora da implementare)
+    // ------------------------------
+    private void menuSalvaParziale_Click ( object? sender, EventArgs e )
+    {
+      try
+      {
+        string valore = txtDisplay.Text;
+        string percorso = "salvataggio.txt";
+
+        // Aggiunge il valore al file, creando il file se non esiste
+        System.IO.File.AppendAllText (percorso, valore + Environment.NewLine);
+
+        MessageBox.Show ("Valore salvato correttamente!", "Salvataggio",
+            MessageBoxButtons.OK, MessageBoxIcon.Information);
+      }
+      catch(Exception ex)
+
+      {
+        MessageBox.Show ("Errore durante il salvataggio:\n" + ex.Message,
+            "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }
 
-    private void Btn4_click ( object sender, EventArgs e )
+    private void salvaParzialeToolStripMenuItem1_Click ( object sender, EventArgs e )
     {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
-
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
-      }
+      menuSalvaParziale_Click (sender, e);
     }
-
-    private void Btn5_ckick ( object sender, EventArgs e )
+    private void toolStripMenuItem1_Click ( object sender, EventArgs e )
     {
+      menuSalvaParziale_Click (sender, e);
       {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
+        string valore = txtDisplay.Text;
+        string percorso = "salvataggio.txt";
 
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
+        System.IO.File.AppendAllText (percorso, valore + Environment.NewLine);
+
+        MessageBox.Show ("Valore salvato correttamente!", "Salvataggio",
+            MessageBoxButtons.OK, MessageBoxIcon.Information);
       }
-    }
-
-    private void Btn6_click ( object sender, EventArgs e )
-    {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
-
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
-      }
-    }
-
-    private void Btn7_click ( object sender, EventArgs e )
-    {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
-
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
-      }
-    }
-
-    private void Btn8_click ( object sender, EventArgs e )
-    {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
-
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
-      }
-    }
-
-    private void Btn9_click ( object sender, EventArgs e )
-    {
-      {
-        System.Windows.Forms.Button b = (System.Windows.Forms.Button)sender;
-
-        // Se il display è 0 o vuoto, sostituisco; altrimenti concateno
-        if(txtDisplay.Text == "0")
-          txtDisplay.Text = b.Text;
-        else
-          txtDisplay.Text += b.Text;
-      }
-    }
-
-    private void (object sender, EventArgs e) btnAdd_Click ( object sender, EventArgs e ) => (sender, e);
-    
-
-    private void btnSub_Click ( object sender, EventArgs e )
-    {
-
     }
   }
 }
+
+
+
+
+
+
